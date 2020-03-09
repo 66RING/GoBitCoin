@@ -1,4 +1,4 @@
-module GoBitCorn
+module GoBitCoin
 
 go 1.13
 
