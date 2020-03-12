@@ -75,6 +75,7 @@ func (blockchain *BlockChain) FindUnspendTransactions(address string) []Transact
 
 		for _, tx := range block.Transactions {
 			txID := hex.EncodeToString(tx.ID)
+
 		Outputs:
 			for outindex, out := range tx.Vout {
 				if spentTXOS[txID] != nil {
@@ -189,11 +190,13 @@ func NewBlockChain(address string) *BlockChain {
 		fmt.Println("Database do not exist")
 		os.Exit(1)
 	}
-	var tip []byte                          //
+
+	var tip []byte
 	db, err := bolt.Open(dbFile, 0600, nil) //open db
 	if err != nil {
 		log.Panic(err)
 	}
+
 	// handle update
 	err = db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(blockBucket))

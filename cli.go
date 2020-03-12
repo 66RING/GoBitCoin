@@ -32,11 +32,11 @@ func (cli *CLI) getBalance(address string) {
 // print usage
 func (cli *CLI) printUsage() {
 	fmt.Println("Usage:")
-	fmt.Println("addblock: add block to blockchain")
-	fmt.Println("showchain: show blockchain")
-	fmt.Println("getbalance: get balance with address")
-	fmt.Println("createblockchain: create BlockChain with address")
-	fmt.Println("send -from From -to To -amount Amount: New transaction")
+	fmt.Printf("\taddblock: add block to blockchain\n")
+	fmt.Printf("\tshowchain: show blockchain\n")
+	fmt.Printf("\tgetbalance: get balance with address\n")
+	fmt.Printf("\tcreateblockchain: create BlockChain with address\n")
+	fmt.Printf("\tsend -from From -to To -amount Amount: New transaction\n")
 }
 
 func (cli *CLI) validateArgs() {
@@ -76,9 +76,9 @@ func (cli *CLI) Run() {
 	cli.validateArgs()
 
 	showchaincmd := flag.NewFlagSet("showchain", flag.ExitOnError)
-	sendcmd := flag.NewFlagSet("send", flag.ExitOnError)
 	getbalancecmd := flag.NewFlagSet("getbalance", flag.ExitOnError)
 	createblockchaincmd := flag.NewFlagSet("createblockchaincmd", flag.ExitOnError)
+	sendcmd := flag.NewFlagSet("send", flag.ExitOnError)
 
 	getbalanceaddress := getbalancecmd.String("address", "", "get balance addree")
 	createblockaddress := createblockchaincmd.String("address", "", "get block addree")
