@@ -5,33 +5,17 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 )
 
 type CLI struct {
 	blockchain *BlockChain
 }
 
-func (cli *CLI) createBlockChain(address string) {
-	bc := createBlockChain(address)
-	bc.db.Close()
-	fmt.Println("Create Success")
-}
-
-func (cli *CLI) getBalance(address string) {
-	bc := NewBlockChain(address)
-	defer bc.db.Close()
-	balance := 0
-	UTXOs := bc.FindUTXO(address) // Find balace
-	for _, out := range UTXOs {
-		balance += out.Value
-	}
-	fmt.Printf("Balance %s: %d \n", address, balance)
-}
-
 // print usage
 func (cli *CLI) printUsage() {
 	fmt.Println("Usage:")
+	fmt.Printf("\tcreatewallet: Create a wallet\n")
+	fmt.Printf("\tlistaddress: show all address(account)\n")
 	fmt.Printf("\taddblock: add block to blockchain\n")
 	fmt.Printf("\tshowchain: show blockchain\n")
 	fmt.Printf("\tgetbalance: get balance with address\n")
@@ -46,35 +30,11 @@ func (cli *CLI) validateArgs() {
 	}
 }
 
-func (cli *CLI) showBlockChian() {
-	bc := NewBlockChain("")
-	defer bc.db.Close()
-
-	bci := bc.Iterator()
-	for {
-		block := bci.next()
-		fmt.Printf("PrevBlockHash: %x", block.PrevBlockHash)
-		fmt.Printf("Current Hash: %x", block.Hash)
-		pow := NewProofOfWork(block)
-		fmt.Printf("pow %s \n", strconv.FormatBool(pow.Validate()))
-
-		if len(block.PrevBlockHash) == 0 {
-			break
-		}
-	}
-}
-
-func (cli *CLI) send(from, to string, amount int) {
-	bc := NewBlockChain(from)
-	defer bc.db.Close()
-	tx := NewUTXOTransaction(from, to, amount, bc)
-	bc.MineBLock([]*Transaction{tx})
-	fmt.Println("Transaction Success!")
-}
-
 func (cli *CLI) Run() {
 	cli.validateArgs()
 
+	listaddressescmd := flag.NewFlagSet("listaddresses", flag.ExitOnError)
+	createwalletcmd := flag.NewFlagSet("createwallet", flag.ExitOnError)
 	showchaincmd := flag.NewFlagSet("showchain", flag.ExitOnError)
 	getbalancecmd := flag.NewFlagSet("getbalance", flag.ExitOnError)
 	createblockchaincmd := flag.NewFlagSet("createblockchaincmd", flag.ExitOnError)
@@ -87,6 +47,16 @@ func (cli *CLI) Run() {
 	sendamount := sendcmd.Int("amount", 0, "amount")
 
 	switch os.Args[1] {
+	case "createwallet":
+		err := createwalletcmd.Parse(os.Args[2:])
+		if err != nil {
+			log.Panic(err)
+		}
+	case "listaddresses":
+		err := listaddressescmd.Parse(os.Args[2:])
+		if err != nil {
+			log.Panic(err)
+		}
 	case "getbalance":
 		err := getbalancecmd.Parse(os.Args[2:])
 		if err != nil {
@@ -111,6 +81,7 @@ func (cli *CLI) Run() {
 		cli.printUsage()
 		os.Exit(1)
 	}
+
 	if getbalancecmd.Parsed() {
 		if *getbalanceaddress == "" {
 			getbalancecmd.Usage()
@@ -137,5 +108,11 @@ func (cli *CLI) Run() {
 	}
 	if showchaincmd.Parsed() {
 		cli.showBlockChian()
+	}
+	if createwalletcmd.Parsed() {
+		cli.createWallet()
+	}
+	if listaddressescmd.Parsed() {
+		cli.listAddress()
 	}
 }
