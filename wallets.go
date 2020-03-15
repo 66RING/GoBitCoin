@@ -57,7 +57,7 @@ func (ws *Wallets) LoadFromFile() error {
 	}
 	// load file binary and parse
 	var wallets Wallets
-	gob.Register(elliptic.P256)
+	gob.Register(elliptic.P256())
 	decoder := gob.NewDecoder(bytes.NewReader(fileContent))
 	err = decoder.Decode(&wallets)
 	if err != nil {

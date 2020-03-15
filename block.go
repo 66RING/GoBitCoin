@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"encoding/gob"
 	"log"
 	"time"
@@ -17,13 +16,12 @@ type Block struct {
 }
 
 func (block *Block) HashTransactions() []byte {
-	var txHashes [][]byte
-	var txHash [32]byte
+	var transacions [][]byte
 	for _, tx := range block.Transactions {
-		txHashes = append(txHashes, tx.ID)
+		transacions = append(transacions, tx.Serialize())
 	}
-	txHash = sha256.Sum256(bytes.Join(txHashes, []byte{}))
-	return txHash[:]
+	mTree := NewMerkleTree(transacions)
+	return mTree.RootNode.data
 }
 
 func NewBlock(transacions []*Transaction, prevBlockHash []byte) *Block {

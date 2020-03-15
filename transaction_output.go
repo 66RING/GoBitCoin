@@ -11,10 +11,6 @@ type TXOutput struct {
 	PubKeyHash []byte
 }
 
-type TXOutputs struct {
-	Outputs []TXOutput
-}
-
 func (out *TXOutput) Lock(address []byte) {
 	pubkeyhash := Base58Decode(address)
 	pubkeyhash = pubkeyhash[1 : len(pubkeyhash)-4]
@@ -30,6 +26,10 @@ func NewTXOutput(value int, address string) *TXOutput {
 	txo := &TXOutput{value, nil}
 	txo.Lock([]byte(address))
 	return txo
+}
+
+type TXOutputs struct {
+	Outputs []TXOutput
 }
 
 // object to binary

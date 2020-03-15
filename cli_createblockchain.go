@@ -10,6 +10,9 @@ func (cli *CLI) createBlockChain(address string) {
 		log.Panic("Address Invalid")
 	}
 	bc := CreateBlockChain(address)
-	bc.db.Close()
+	defer bc.db.Close()
+
+	UTXOSet := UTXOSet{bc} // creata a UTXOSet
+	UTXOSet.Reindex()
 	fmt.Println("Create SUCCESS")
 }

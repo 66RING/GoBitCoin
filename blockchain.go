@@ -20,7 +20,7 @@ type BlockChain struct {
 	db  *bolt.DB
 }
 
-func (blockchain *BlockChain) MineBLock(transactions []*Transaction) {
+func (blockchain *BlockChain) MineBLock(transactions []*Transaction) *Block {
 	var lastHash []byte
 	for _, tx := range transactions {
 		if blockchain.VerifyTransaction(tx) != true {
@@ -50,6 +50,7 @@ func (blockchain *BlockChain) MineBLock(transactions []*Transaction) {
 		blockchain.tip = newBlock.Hash // store last hash
 		return nil
 	})
+	return newBlock
 }
 
 // get all unspent transaction
@@ -196,7 +197,7 @@ func (block *BlockChain) Iterator() *BlockChainIterator {
 	return bcit // create interator
 }
 
-func NewBlockChain(address string) *BlockChain {
+func NewBlockChain() *BlockChain {
 	if dbExists() == false {
 		fmt.Println("Database do not exist")
 		os.Exit(1)

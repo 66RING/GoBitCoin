@@ -189,7 +189,7 @@ func DeserializeTransaction(data []byte) Transaction {
 	return transaction
 }
 
-func NewUTXOTransaction(from, to string, amount int, bc *BlockChain) *Transaction {
+func NewUTXOTransaction(from, to string, amount int, UTXOset *UTXOSet) *Transaction {
 	var inputs []TXInput
 	var outputs []TXOutput
 	wallets, err := NewWallets()
@@ -198,7 +198,7 @@ func NewUTXOTransaction(from, to string, amount int, bc *BlockChain) *Transactio
 	}
 	wallet := wallets.GetWallet(from)
 	pubkeyhash := HashPubkey(wallet.PublicKey)
-	acc, validOutputs := bc.FindSpendableOutputs(pubkeyhash, amount)
+	acc, validOutputs := UTXOset.FindSpendableOutputs(pubkeyhash, amount)
 	if acc < amount {
 		log.Panic("Don't have enough money")
 	}
@@ -219,6 +219,6 @@ func NewUTXOTransaction(from, to string, amount int, bc *BlockChain) *Transactio
 	}
 	tx := Transaction{nil, inputs, outputs}
 	tx.ID = tx.Hash()
-	bc.SignTransaction(&tx, wallet.PrivateKey)
+	UTXOset.blockchain.SignTransaction(&tx, wallet.PrivateKey)
 	return &tx
 }

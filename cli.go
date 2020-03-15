@@ -21,6 +21,7 @@ func (cli *CLI) printUsage() {
 	fmt.Printf("\tgetbalance: get balance with address\n")
 	fmt.Printf("\tcreateblockchain: create BlockChain with address\n")
 	fmt.Printf("\tsend -from From -to To -amount Amount: New transaction\n")
+	fmt.Printf("\treindexutxo: Reindex UTXO\n")
 }
 
 func (cli *CLI) validateArgs() {
@@ -39,6 +40,7 @@ func (cli *CLI) Run() {
 	getbalancecmd := flag.NewFlagSet("getbalance", flag.ExitOnError)
 	createblockchaincmd := flag.NewFlagSet("createblockchaincmd", flag.ExitOnError)
 	sendcmd := flag.NewFlagSet("send", flag.ExitOnError)
+	reindexutxocmd := flag.NewFlagSet("reindexutxo", flag.ExitOnError)
 
 	getbalanceaddress := getbalancecmd.String("address", "", "get balance addree")
 	createblockaddress := createblockchaincmd.String("address", "", "get block addree")
@@ -73,6 +75,11 @@ func (cli *CLI) Run() {
 			log.Panic(err)
 		}
 	case "showchain":
+		err := showchaincmd.Parse(os.Args[2:])
+		if err != nil {
+			log.Panic(err)
+		}
+	case "reindexutxo":
 		err := showchaincmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
@@ -114,5 +121,8 @@ func (cli *CLI) Run() {
 	}
 	if listaddressescmd.Parsed() {
 		cli.listAddress()
+	}
+	if reindexutxocmd.Parsed() {
+		cli.reindexUTXOP()
 	}
 }
