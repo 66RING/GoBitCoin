@@ -17,10 +17,10 @@ type Wallets struct {
 }
 
 // New a wallet or get a wallet
-func NewWallets() (*Wallets, error) {
+func NewWallets(nodeID string) (*Wallets, error) {
 	wallets := Wallets{}
 	wallets.Wallets = make(map[string]*Wallet)
-	err := wallets.LoadFromFile()
+	err := wallets.LoadFromFile(nodeID)
 	return &wallets, err
 }
 
@@ -46,8 +46,8 @@ func (ws *Wallets) GetWallet(address string) Wallet {
 }
 
 // load wallet from file
-func (ws *Wallets) LoadFromFile() error {
-	mywalletfile := walletfile // gen file address
+func (ws *Wallets) LoadFromFile(nodeID string) error {
+	mywalletfile := fmt.Sprintf(walletFile, nodeID) // gen file address
 	if _, err := os.Stat(mywalletfile); os.IsNotExist(err) {
 		return err
 	}
@@ -69,10 +69,10 @@ func (ws *Wallets) LoadFromFile() error {
 }
 
 // save wallet to file
-func (ws *Wallets) SaveToFile() {
+func (ws *Wallets) SaveToFile(nodeID string) {
 	var content bytes.Buffer
-	mywalletfile := walletfile    // gen file address
-	gob.Register(elliptic.P256()) // registe a crypto
+	mywalletfile := fmt.Sprintf(walletFile, nodeID) // gen file address
+	gob.Register(elliptic.P256())                   // registe a crypto
 	encoder := gob.NewEncoder(&content)
 	err := encoder.Encode(ws)
 	if err != nil {

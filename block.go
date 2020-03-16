@@ -13,6 +13,7 @@ type Block struct {
 	PrevBlockHash []byte
 	Hash          []byte
 	Nonce         int
+	Height        int
 }
 
 func (block *Block) HashTransactions() []byte {
@@ -24,12 +25,12 @@ func (block *Block) HashTransactions() []byte {
 	return mTree.RootNode.data
 }
 
-func NewBlock(transacions []*Transaction, prevBlockHash []byte) *Block {
+func NewBlock(transacions []*Transaction, prevBlockHash []byte, height int) *Block {
 	block := &Block{time.Now().Unix(),
 		transacions,
 		prevBlockHash,
 		[]byte{},
-		0}
+		0, height}
 
 	pow := NewProofOfWork(block)
 	nonce, hash := pow.Run()
@@ -41,7 +42,7 @@ func NewBlock(transacions []*Transaction, prevBlockHash []byte) *Block {
 
 // genesis block
 func NewGenesisBlock(coinbase *Transaction) *Block {
-	return NewBlock([]*Transaction{coinbase}, []byte{})
+	return NewBlock([]*Transaction{coinbase}, []byte{}, 0)
 }
 
 // Object to binary byte set, and write into file

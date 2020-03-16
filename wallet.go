@@ -12,7 +12,8 @@ import (
 )
 
 const version = byte(0x00)
-const walletfile = "wallet.dat"
+
+//const walletfile = "wallet.dat"
 const addressChecksumlen = 4
 
 type Wallet struct {

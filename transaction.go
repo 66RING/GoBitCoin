@@ -189,14 +189,10 @@ func DeserializeTransaction(data []byte) Transaction {
 	return transaction
 }
 
-func NewUTXOTransaction(from, to string, amount int, UTXOset *UTXOSet) *Transaction {
+func NewUTXOTransaction(wallet *Wallet, to string, amount int, UTXOset *UTXOSet) *Transaction {
 	var inputs []TXInput
 	var outputs []TXOutput
-	wallets, err := NewWallets()
-	if err != nil {
-		log.Panic(err)
-	}
-	wallet := wallets.GetWallet(from)
+
 	pubkeyhash := HashPubkey(wallet.PublicKey)
 	acc, validOutputs := UTXOset.FindSpendableOutputs(pubkeyhash, amount)
 	if acc < amount {
@@ -212,6 +208,8 @@ func NewUTXOTransaction(from, to string, amount int, UTXOset *UTXOSet) *Transact
 			inputs = append(inputs, input)
 		}
 	}
+
+	from := fmt.Sprintf("%s", wallet.GetAddress())
 
 	outputs = append(outputs, *NewTXOutput(amount, to))
 	if acc > amount {

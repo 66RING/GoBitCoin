@@ -5,11 +5,11 @@ import (
 	"log"
 )
 
-func (cli *CLI) getBalance(address string) {
+func (cli *CLI) getBalance(address string, nodeID string) {
 	if !ValidateAddress(address) {
 		log.Panic("Invalid address")
 	}
-	bc := NewBlockChain()
+	bc := NewBlockChain(nodeID)
 	defer bc.db.Close()
 
 	UTXOSet := UTXOSet{bc}

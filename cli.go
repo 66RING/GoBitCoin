@@ -20,8 +20,9 @@ func (cli *CLI) printUsage() {
 	fmt.Printf("\tshowchain: show blockchain\n")
 	fmt.Printf("\tgetbalance: get balance with address\n")
 	fmt.Printf("\tcreateblockchain: create BlockChain with address\n")
-	fmt.Printf("\tsend -from From -to To -amount Amount: New transaction\n")
+	fmt.Printf("\tsend -from From -to To -amount Amount -mine: New transaction (-mine) now or not\n")
 	fmt.Printf("\treindexutxo: Reindex UTXO\n")
+	fmt.Printf("\tstartnode -miner ADDR: Open a node\n")
 }
 
 func (cli *CLI) validateArgs() {
@@ -34,6 +35,14 @@ func (cli *CLI) validateArgs() {
 func (cli *CLI) Run() {
 	cli.validateArgs()
 
+	nodeID := "3002"
+	// export NODE_ID= ?
+	//nodeID := os.Getenv("NODE_ID")
+	//if nodeID == "" {
+	//	fmt.Println("Must have a running port num")
+	//	os.Exit(1)
+	//}
+
 	listaddressescmd := flag.NewFlagSet("listaddresses", flag.ExitOnError)
 	createwalletcmd := flag.NewFlagSet("createwallet", flag.ExitOnError)
 	showchaincmd := flag.NewFlagSet("showchain", flag.ExitOnError)
@@ -41,12 +50,15 @@ func (cli *CLI) Run() {
 	createblockchaincmd := flag.NewFlagSet("createblockchaincmd", flag.ExitOnError)
 	sendcmd := flag.NewFlagSet("send", flag.ExitOnError)
 	reindexutxocmd := flag.NewFlagSet("reindexutxo", flag.ExitOnError)
+	startnodecmd := flag.NewFlagSet("startnode", flag.ExitOnError)
 
 	getbalanceaddress := getbalancecmd.String("address", "", "get balance addree")
 	createblockaddress := createblockchaincmd.String("address", "", "get block addree")
 	sendfrom := sendcmd.String("from", "", "from who")
 	sendto := sendcmd.String("to", "", "to who")
 	sendamount := sendcmd.Int("amount", 0, "amount")
+	sendmine := sendcmd.Bool("mine", false, "mine now?")
+	startnodeminer := startnodecmd.String("miner", "", "mine?")
 
 	switch os.Args[1] {
 	case "createwallet":
@@ -80,7 +92,12 @@ func (cli *CLI) Run() {
 			log.Panic(err)
 		}
 	case "reindexutxo":
-		err := showchaincmd.Parse(os.Args[2:])
+		err := reindexutxocmd.Parse(os.Args[2:])
+		if err != nil {
+			log.Panic(err)
+		}
+	case "startnode":
+		err := startnodecmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
 		}
@@ -94,7 +111,7 @@ func (cli *CLI) Run() {
 			getbalancecmd.Usage()
 			os.Exit(1)
 		}
-		cli.getBalance(*getbalanceaddress)
+		cli.getBalance(*getbalanceaddress, nodeID)
 	}
 
 	if createblockchaincmd.Parsed() {
@@ -102,7 +119,7 @@ func (cli *CLI) Run() {
 			createblockchaincmd.Usage()
 			os.Exit(1)
 		}
-		cli.createBlockChain(*createblockaddress)
+		cli.createBlockChain(*createblockaddress, nodeID)
 	}
 
 	if sendcmd.Parsed() {
@@ -110,19 +127,22 @@ func (cli *CLI) Run() {
 			sendcmd.Usage()
 			os.Exit(1)
 		}
-		cli.send(*sendfrom, *sendto, *sendamount)
+		cli.send(*sendfrom, *sendto, *sendamount, nodeID, *sendmine)
 
 	}
 	if showchaincmd.Parsed() {
-		cli.showBlockChian()
+		cli.showBlockChian(nodeID)
 	}
 	if createwalletcmd.Parsed() {
-		cli.createWallet()
+		cli.createWallet(nodeID)
 	}
 	if listaddressescmd.Parsed() {
-		cli.listAddress()
+		cli.listAddress(nodeID)
 	}
 	if reindexutxocmd.Parsed() {
-		cli.reindexUTXOP()
+		cli.reindexUTXOP(nodeID)
+	}
+	if startnodecmd.Parsed() {
+		cli.startNode(nodeID, *startnodeminer)
 	}
 }
