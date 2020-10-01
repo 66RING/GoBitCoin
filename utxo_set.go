@@ -91,6 +91,7 @@ func (utxo UTXOSet) CountTransaction() int {
 func (utxo UTXOSet) Reindex() {
 	db := utxo.blockchain.db
 	bucketname := []byte(utxoBucket)
+	// recreate bucket
 	err := db.Update(func(tx *bolt.Tx) error {
 		err := tx.DeleteBucket(bucketname)
 		if err != nil && err != bolt.ErrBucketNotFound {
@@ -103,9 +104,11 @@ func (utxo UTXOSet) Reindex() {
 
 		return nil
 	})
+
 	if err != nil {
 		log.Panic(err)
 	}
+	// reindex UTXO
 	UTXO := utxo.blockchain.FindUTXO()
 	err = db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket(bucketname)

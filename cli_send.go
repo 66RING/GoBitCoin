@@ -14,6 +14,7 @@ func (cli *CLI) send(from, to string, amount int, nodeID string, mineNow bool) {
 	if !ValidateAddress(to) {
 		log.Panic("Invalid address (to)")
 	}
+	// get block chain by nodeID
 	bc := NewBlockChain(nodeID)
 	defer bc.db.Close()
 	UTXOSet := UTXOSet{bc}
@@ -22,6 +23,7 @@ func (cli *CLI) send(from, to string, amount int, nodeID string, mineNow bool) {
 	if err != nil {
 		log.Panic(err)
 	}
+	// get wallet from wallets by address
 	wallet := wallets.GetWallet(from)
 	tx := NewUTXOTransaction(&wallet, to, amount, &UTXOSet)
 

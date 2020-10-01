@@ -42,6 +42,7 @@ func (tx *Transaction) Sign(privateKey ecdsa.PrivateKey, prevTXs map[string]Tran
 			log.Panic("Previous Transaction Invalid ")
 		}
 	}
+
 	txCopy := tx.TrimmedCopy() // copy trimmed copy, withouy private key
 	for inID, vin := range txCopy.Vin {
 		prevTx := prevTXs[hex.EncodeToString(vin.Txid)]

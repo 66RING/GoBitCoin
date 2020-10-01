@@ -105,7 +105,7 @@ func sendaddr(address string) {
 func sendData(addr string, data []byte) {
 	conn, err := net.Dial(protocol, addr) // Establish tcp connection object
 	if err != nil {
-		fmt.Printf("%s Address can be reach.\n", addr)
+		fmt.Printf("%s Address can't be reach.\n", addr)
 		var updateNodes []string
 		for _, node := range knowNodes {
 			if node != addr {
@@ -127,7 +127,9 @@ func sendData(addr string, data []byte) {
 func sendInv(address, kind string, items [][]byte) {
 	inventory := inv{nodeAddress, kind, items} // inventory data
 	payload := gobEncode(inventory)            // history data
+
 	request := append(commandToBytes("inv"), payload...)
+
 	sendData(address, request)
 
 }
@@ -161,7 +163,6 @@ func sendVersion(addr string, bc *BlockChain) {
 
 	request := append(commandToBytes("version"), payload...)
 	sendData(addr, request)
-
 }
 
 func handleBlock(request []byte, bc *BlockChain) {

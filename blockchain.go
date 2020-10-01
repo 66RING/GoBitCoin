@@ -228,7 +228,7 @@ func CreateBlockChain(address string, nodeID string) *BlockChain {
 			log.Panic(err)
 		}
 
-		err = bucket.Put([]byte("1"), genesis.Hash)
+		err = bucket.Put([]byte("1"), genesis.Hash) // value 1 map to that last hash into bocket
 		if err != nil {
 			log.Panic(err)
 		}
